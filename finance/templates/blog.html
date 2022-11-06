@@ -1,0 +1,269 @@
+{% extends 'layout.html' %}
+
+
+{% block title %} Blog {% endblock %}
+
+
+{% block head %}
+<style>
+
+    body main {
+      font-family:Verdana;
+    }
+    /* Every div inside will be in same line  */
+    .container{
+      display:flex;
+      flex-wrap: wrap;
+      word-wrap: break-word;
+      margin-top:37px;
+      margin-bottom:60px;
+      position:relative;
+    }
+    /* Header with a bottom to create a blog */
+    header{
+      height:63px;
+      width:976px;
+      position:absolute;
+      top:-80px;
+    }
+    /*header div {
+      margin-bottom:80px;
+      padding:13px;
+    }*/
+
+    /*  Style the blog  */
+    .blog{
+      border-style: inset;
+      padding:15px;
+      margin:30px 38px 40px 0px;
+      width:300px;
+    }
+    .blog a{
+      text-decoration:none;
+      color:RGB(102, 98, 95);
+
+    }
+    .blog a:hover{
+      color:gray;
+    }
+    /* Inside the blog  */
+    .title {
+      height:60px;
+      margin-bottom:20px;
+      overflow: auto;
+    }
+    .img-section {
+      background-color:white;
+      color:#999;
+    }
+    .img-section img {
+      height:176px;
+      width:264px;
+      border-radius:5px;
+    }
+    small span {
+      font-weight:bold;
+      color:RGB(74, 71, 69);
+    }
+
+    /*   When ReadMore buttom is clicked    */
+    #rmBlog{
+      width:80%;
+      margin:auto;
+      margin-bottom:20px;
+      padding:30px;
+      border-style: outset;
+    }
+
+    /* Style article, img, content */
+    #readMoreTitle {
+      font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+      text-align:center;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    #readMoreImg {
+      text-align:center;
+      color:#999;
+    }
+    #readMoreImg img {
+      border-radius:5px;
+      width:400px;
+      height:300px;
+    }
+    #readMoreContent{
+      text-align: justify;
+    }
+    #readMoreAuthor {
+      font-weight:bold;
+    }
+</style>
+{% endblock %}
+
+
+
+{% block blog %}
+  <!-- Display the article when ReadMore bottom is clicked  -->
+  <div id="rmBlog">
+      <div id="readMoreImg" hidden>
+          <p><img src="" alt="trade"></p>
+          <small>Posted by : <span id="readMoreAuthor"></span> in <span id="date"></span> </small><hr/>
+      </div>
+      <div id="readMoreTitle"></div>
+      <div id="readMoreContent"></div>
+  </div>
+{% endblock %}
+
+
+<!-- Main page will display a portion of each blog   -->
+{% block main %}
+  <div class="container">
+
+      <header>
+          <div>
+              <a href="/createblog"><buttom type="submit" class="btn btn-secondary">CREATE YOUR BLOG</buttom></a>
+          </div>
+      </header>
+
+      <!-- blog (id, user_id, title, author, content, date, img)-->
+      {% for blog in blogs %}
+      <!-- Blog  -->
+      <div class="blog" class="border">
+
+          <!-- Title -->
+          <div class="title">
+              <a href="#"><h5>{{ blog[2] }}</h5></a>
+              <input type="hidden" id="articleID" value="{{ blog[0] }}">
+          </div>
+          <!-- Author & img -->
+          <div class="img-section">
+              <input type="hidden" class="databaseImg" value="{{ blog[6] }}">
+              <img src="" alt="trade">
+              <small>Posted by: <span>{{ blog[3] }} </span></small><hr/>
+          </div>
+
+          <div class="form-group">
+              <!-- Display ==> when buttom is clicked-->
+              <buttom type="submit" class="btn btn-secondary" onClick="readMore(`{{ blog }}`)">Read More</buttom>
+
+              {% if blog[1] == session.user_id  %}
+                    <buttom type="submit" class="btn btn-dark"
+                            onClick="deletePost(`{{ blog }}`)">Delete post</buttom>
+              {% endif %}
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+{% endblock %}
+
+
+<!-- JavaScript -->
+{% block script %}
+  <script>
+      document.addEventListener("DOMContentLoaded", ()=> {
+
+         // line 144
+         // Select the tag that have the path of each blog img (one step before the image)
+          let div_img = document.querySelectorAll(".databaseImg");
+
+          for(let i = 0; i < div_img.length; i++) {
+
+              /* Either path of img            ===> is STORED IN DATABASE as path to the img  in my folder
+                                               ===> is STORED IN DATABASE as URL  of the img  in user browser */
+              let Path_img = div_img[i].value;
+
+             // Local storage if uploaded by user, stored in his browser
+              local_Storage = localStorage.getItem(Path_img);
+
+             // Local storage
+              if (local_Storage != null) {
+                  div_img[i].nextElementSibling.setAttribute("src", local_Storage);
+              }
+             // URL path to my folder of the img randomly given
+              else {
+                  div_img[i].nextElementSibling.setAttribute("src", Path_img );
+              }
+          }
+      })
+
+     // Execpt a tuble() with quotes " " , javascript don't have tuble -- so will convert it to string
+      function readMore(blog)
+      {
+        // To remove first & last parantheses &&  leave the () inside image name
+        blog = blog.slice(1, -1)
+
+        // escape quotes
+        blog = blog.replace(/"|'/g,"");
+
+        // Convert to array
+        blog = blog.split(",");
+
+        // Hide the blog's main page
+        document.querySelector(".container").style.display = "none";
+
+        // TABLE ====> blog (id, user_id, title, author, content, date, img) 
+
+        // Display the blog selected in whole page
+        document.querySelector("#rmBlog").classList.add("show");
+        document.querySelector("#readMoreImg").removeAttribute("hidden");
+        document.querySelector("#readMoreTitle").innerHTML = blog[2];
+        document.querySelector("#readMoreAuthor").innerHTML = blog[3];
+        document.querySelector("#readMoreContent").innerHTML = blog[4];
+        document.querySelector("#date").innerHTML = blog[5];
+
+        let div_img = document.querySelector("#readMoreImg p");
+
+        let Path_img = blog[6].trim();
+
+        // Local storage if uploaded by user in his browser
+        local_Storage = localStorage.getItem(Path_img);
+
+        // Local storage
+        if (local_Storage != null) {
+            div_img.firstChild.setAttribute("src", local_Storage);
+        }
+        // URL path to my folder of the img randomly given
+        else {
+            div_img.firstChild.setAttribute("src", Path_img );
+        }
+    }
+
+
+    function deletePost(blog) {
+
+        // escape parentheses & quotes
+        blog = blog.replace(/\(|\)|"|'/g,"");
+
+        // Convert to array
+        blog = blog.split(",");
+
+         // GET the id & delete the img from browser
+        id = blog[0]
+        img = blog[6].trim()
+        window.localStorage.removeItem(img)
+
+         // Send a request to the backend to delete the post
+        let mypromise = new Promise(function(resolve,reject) {
+
+            let req = new XMLHttpRequest();
+            req.onreadystatechange = ()=> {
+                if (req.readyState == 4)
+                {
+                    if (req.status == 200) {
+                        resolve(req.response)
+                        window.location.href = "/blog";
+                    }
+                    else {
+                        reject("Request failed");
+                    }
+                }
+            }
+            data = JSON.stringify( {'jsonkey' : id} )
+            req.open("POST", "/delete-blog")
+            req.send(data)
+        })
+        mypromise.then( (value)=> {console.log(value), (error)=> {console.log(error)} })
+    }
+
+  </script>
+{% endblock %}

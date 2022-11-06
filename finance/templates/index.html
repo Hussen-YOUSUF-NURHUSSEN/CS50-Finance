@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+
+{% block main %}
+
+<table class="table table-striped">
+  <thead style="text-align:left" class="thead-dark">
+    <tr>
+      <th scope="col">Symbol</th>
+      <th scope="col">Name</th>
+      <th scope="col">Shares</th>
+      <th scope="col">Price</th>
+      <th scope="col">TOTAL</th>
+    </tr>
+  </thead>
+
+  <tbody style="text-align:left" >
+
+    <!-- [user_id, name, price, symbol, shares, total] -->
+
+    {% for purchase in purchases %}
+    <tr>
+      <td> {{ purchase[3] }} </td>
+      <td> {{ purchase[1] }} </td>
+      <td> {{ purchase[4] }} </td>
+      <td> {{ purchase[2] }} </td>
+      <td> {{ purchase[5] }} </td>
+    </tr>
+    {% endfor %}
+
+     <tr>
+      <td>CASH</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td> {{ current_Cash }} </td>
+    </tr>
+    <tr style="background-color:white">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td><b> {{ startCash }} <b></b></td>
+    </tr>
+  </tbody>
+
+</table>
+{% endblock %}
+

@@ -1,0 +1,106 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<style>
+
+form{
+    /*background-color:blue;*/
+    width:750px;
+    margin:auto;
+    padding-top:20px;
+    border:1px solid gray;
+}
+input[type=text]{
+    position:relative;
+    margin-bottom:10px;
+    /*background-color:red;*/
+    width:81%;
+}
+.container {
+    /*background-color:yellow;*/
+}
+.txt{
+    position:relative;
+    font-family: "Gill Sans", sans-serif;
+}
+input[type=file]{
+    position:relative;
+    right:150px;
+    opacity:0.6;
+    margin-bottom:5px;
+}
+
+
+</style>
+{% endblock %}
+
+{% block main %}
+
+    <!--  Display a form to create a post -->
+    <div class="container">
+        <form action="/createblog" method="post">
+
+            <h3 style="color:#aa4f9e;"><center>Add Blog</center></h3>
+
+            <!-- Add Title  -->
+            <div class="form-group">
+                <h4 style="right:280px" class='txt'>Title</h4>
+                <input type="text" class="form-control" id="title" name="title" maxlength="100" required  >
+            </div>
+            <!-- Add Author -->
+            <div class="form-group">
+                <h4 style="right:262px" class='txt'>Author</h4>
+                <input type="text" class="form-control" id="author" name="author" maxlength="25" required  >
+            </div>
+            <!-- Add Content -->
+            <div class="form-group">
+                <h4 style="right:258px" class='txt'>Content</h4>
+                <textarea class="form-control" rows="5" cols="80" id="Content" name="content" width="300px" maxlength="1400" required></textarea>
+            </div>
+
+            <!-- Add img -->
+            <div class="form-group">
+                <h4 style="right:265px" class='txt'>Photo</h4>
+
+                <!-- name ==> python will store the "name" of img in database
+                    id  ==> javascript will store a "url" of it in local storage - can be accessed by "name"-->
+                <input type='file' name='img' id='imgFile'>
+            </div>
+
+            <button type="submit"class="btn btn-primary" id="button">Submit</button><br><br>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+<!-- JavaScript -->
+{% block script %}
+    <script>
+
+        // Check if user upload an img
+        let imgFile = document.querySelector("#imgFile");
+
+        imgFile.addEventListener("change", ()=> {
+
+            // Extract the filename from   c:\uploads\file.jpg.
+            nameOfImg = imgFile.value.split(/(\\|\/)/g).pop();   
+
+            let reader = new FileReader();
+
+            reader.addEventListener("load", ()=> {
+
+                // IF IMG UPLOADED and VALID
+                if (imgFile.value && nameOfImg && reader.result)
+                {
+                    console.log(reader.result)
+                    localStorage.setItem(nameOfImg, reader.result);
+                }
+            })
+            reader.readAsDataURL(imgFile.files[0])
+        })
+
+    </script>
+{% endblock %}
+
+

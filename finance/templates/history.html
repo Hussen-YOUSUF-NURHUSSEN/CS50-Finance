@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+
+{% block main %}
+<table class="table table-striped">
+
+  <thead style="text-align:left" class="thead-dark" id="flower" >
+    <tr>
+      <th scope="col">Symbol</th>
+      <th scope="col">Shares</th>
+      <th scope="col">Price</th>
+      <th scope="col">Transacted</th>
+    </tr>
+  </thead>
+
+  <tbody style="text-align:left">
+    <!--transactions (user_id, symbol, shares, price, transacted)-->
+    {% for history in historys %}
+        <tr>
+          <td> {{ history[1] }} </td>
+          <td> {{ history[2] }} </td>
+          <td> {{ history[3] }} </td>
+          <td> {{ history[4] }} </td>
+        </tr>
+    {% endfor %}
+  </tbody>
+
+</table>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'layout.html' %}
+
+
+{% block title %} Note {% endblock %}
+
+
+{% block head %}
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+<style>
+    .notes {
+      text-align:left;
+      padding:10px;
+    }
+    .danger {
+      background-color: #ffdddd;
+      border-left: 6px solid #f44336;
+    }
+    .success {
+      background-color: #ddffdd;
+      border-left: 6px solid #04AA6D;
+    }
+    .info {
+      background-color: #e7f3fe;
+      border-left: 6px solid #2196F3;
+    }
+    .warning {
+      background-color: #ffffcc;
+      border-left: 6px solid #ffeb3b;
+    }
+
+</style>
+{% endblock %}
+
+
+{% block main %}
+
+<!--  Send notes to database -->
+  <div class="container">
+      <form action="/note" method="post">
+
+          <div class="form-group">
+              <h2>Notes</h2>
+              <textarea class="form-control" rows="5" cols="100" id="note" name="note" width="300px"></textarea>
+          </div>
+
+          <button type="submit"class="btn btn-primary" id="button">Add</button><br><br>
+
+      </form>
+  </div>
+
+<!--  Receive notes's form database & display them  -->
+  <div class="container">
+      <p id="demo"></p>
+      {% for note in notes %}
+          <!-- notes (id, user, data)-->
+          <button class="close" onClick="deleteNote( {{ note[0] }} )">
+              <span aria-hidden="true">&times;</span>
+          </button>
+
+          <div class="notes">
+              <p style="position:relative; top:6px;">{{ note[2] }}</p>
+          </div>
+
+        <hr>
+      {% endfor %}
+  </div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+
+  // Add a color to each note
+  document.addEventListener('DOMContentLoaded', ()=> {
+
+      let notes = document.querySelectorAll(".notes");
+      let myarr = ['danger','success','info','warning'];
+
+      for(let i = 0, j = 0; i < notes.length; i++,j++){
+
+        if (j == myarr.length){
+          j = 0;
+        }
+        notes[i].classList.add(myarr[j]);
+      }
+  })
+
+
+  function deleteNote(note_id) {
+
+    //     Promise()
+      let mypromise = new Promise(function(resolve,reject) {
+
+        let req = new XMLHttpRequest();
+
+        req.onreadystatechange = ()=> {
+            if (req.readyState == 4)
+            {
+              if (req.status == 200) {
+                  resolve(req.response)
+                  window.location.href = '/note';
+              }
+              else {
+                  reject("Not Successful")
+              }
+            }
+        }
+        data = JSON.stringify( {'jsonKey':note_id} )
+        req.open("POST", "/delete-note");
+        req.send(data)
+      })
+      mypromise.then( (value)=> {console.log(value)} , (error)=> {console.log(error)} )
+
+  }
+</script>
+{% endblock %}
+
+
+
+

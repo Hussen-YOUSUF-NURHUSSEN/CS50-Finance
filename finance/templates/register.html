@@ -1,0 +1,187 @@
+{% extends "layout.html" %}
+
+{% block title %} Register {% endblock %}
+
+{% block head %}
+    <style>
+        #message {
+            display:none;
+            /*background: #f1f1f1;*/
+            color: #000;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+        #checkConfirm {
+            display:block;
+            margin-bottom: 10px;
+        }
+        .invalid {
+            color: red;
+        }
+        .invalid:before {
+            position:relative;
+            left: -10px;
+            content: "✖";
+        }
+        .valid {
+            color:green;
+        }
+        .valid:before {
+           position:relative;
+           left: -10px;
+           content: "✔";
+        }
+    </style>
+{% endblock %}
+
+
+{% block main %}
+    <form action="/register" method="post" class="was-validated">
+
+        <div class="form-group">
+            <input type="text" name="username"  placeholder="Username" autofocus autocomplete="off" class="form-control" required>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="password" id="pass" placeholder="Password"
+                   autofocus autocomplete="off" class="form-control" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="confirmation" id="confirm" placeholder="Password (again)"
+            `      autofocus autocomplete="off" class="form-control" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="show">
+            <label for="show">Show password</label>
+        </div>
+
+        <div id="message">
+            <h4>Password must contain the following:</h4>
+            <p id="letter" class="invalid">A lowercase letter</p>
+            <p id="capital" class="invalid">An uppercase letter</p>
+            <p id="number" class="invalid">A number</p>
+            <p id="length" class="invalid">Minimum 8 characters</p>
+        </div>
+
+        <small id="checkConfirm"></small>
+        <button type="submit"class="btn btn-primary">Register</button>
+
+    </form>
+{% endblock %}
+
+{% block script %}
+    <script>
+        /*Password Validation */
+         let pass = document.querySelector("#pass");
+         let confirm = document.querySelector("#confirm");
+
+         let showPass = document.querySelector("#show");
+
+         let number = document.querySelector("#number");
+         let length = document.querySelector("#length");
+         let lowerLetter = document.querySelector("#letter");
+         let upperLetter = document.querySelector("#capital");
+
+
+         // Show the password if checkd
+
+         showPass.addEventListener("change", ($event)=> {
+
+             if($event.target.checked)
+             {
+                 pass.setAttribute("type","text");
+                 confirm.setAttribute("type","text");
+             }
+             else {
+                 pass.setAttribute("type","password");
+                 confirm.setAttribute("type","password");
+             }
+         })
+
+
+         // Display the message if inside the password field
+         let msg = document.querySelector("#message");
+         pass.addEventListener('focus', ()=> {
+              msg.style.display = 'block';
+         })
+         pass.addEventListener('blur', ()=> {
+              msg.style.display = 'none';
+         })
+
+         // Validate length
+         pass.addEventListener('keyup', ()=> {
+              if (pass.value.length >= 8) {
+                   length.classList.add("valid");
+                   length.classList.remove("invalid");
+              }
+              else {
+                   length.classList.add("invalid");
+                   length.classList.remove("valid");
+              }
+         })
+
+         // Validate lower Letter
+         pass.addEventListener('keyup', ()=> {
+
+              let checkLower = /[a-z]/g
+              if (pass.value.match(checkLower)) {
+                   lowerLetter.classList.add("valid");
+                   lowerLetter.classList.remove("invalid");
+              }
+              else {
+                   lowerLetter.classList.add("invalid");
+                   lowerLetter.classList.remove("valid");
+              }
+         })
+
+         // Validate upper Letter
+         pass.addEventListener('keyup', ()=> {
+
+              let checkUpper = /[A-Z]/g
+              if (pass.value.match(checkUpper)) {
+                   upperLetter.classList.add("valid");
+                   upperLetter.classList.remove("invalid");
+              }
+              else {
+                   upperLetter.classList.add("invalid");
+                   upperLetter.classList.remove("valid");
+              }
+         })
+
+          // Validate number
+         pass.addEventListener('keyup', ()=> {
+
+              let numberValid = /[0-9]/g
+              if (pass.value.match(numberValid)) {
+                   number.classList.add("valid");
+                   number.classList.remove("invalid");
+              }
+              else {
+                   number.classList.add("invalid");
+                   number.classList.remove("valid");
+              }
+         })
+
+         // Validate match password with confirmation
+         confirm.addEventListener('blur', ()=> {
+
+              let msg = document.querySelector("#checkConfirm");
+              if(pass.value != confirm.value && pass.value && confirm.value) {
+                   pass.style.border = "1px solid red";
+                   confirm.style.border = "1px solid red";
+                   msg.innerHTML = `Password don't match`;
+              }
+              else {
+                   pass.style.border = "1px solid gray";
+                   confirm.style.border = "1px solid gray";
+                   msg.innerHTML = ``;
+              }
+         })
+    </script>
+{% endblock %}
+
+
+
